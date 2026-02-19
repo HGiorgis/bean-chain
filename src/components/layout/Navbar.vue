@@ -16,10 +16,6 @@
               data-lucide="bean"
               class="w-8 h-8 text-amber-700 group-hover:animate-bounce"
             ></i>
-            <span
-              class="absolute -top-1 -right-1 text-xs bg-amber-500 text-white rounded-full w-4 h-4 flex items-center justify-center animate-pulse"
-              >3</span
-            >
           </div>
           <div class="flex flex-col">
             <span
@@ -59,25 +55,60 @@
 
         <!-- Right Side Actions -->
         <div class="hidden md:flex items-center space-x-4">
-          <!-- Wallet Connect Button -->
-          <button @click="toggleWallet" class="relative group">
-            <div
-              class="absolute inset-0 bg-gradient-to-r from-amber-400 to-amber-600 rounded-lg blur opacity-70 group-hover:opacity-100 transition duration-300"
-            ></div>
-            <div
-              class="relative px-4 py-2 bg-black rounded-lg flex items-center space-x-2"
+          <!-- Auth Section -->
+          <template v-if="!authStore.isAuthenticated">
+            <router-link
+              to="/login"
+              class="text-sm font-medium text-gray-700 hover:text-amber-600 transition-colors"
             >
-              <span
-                class="w-2 h-2 bg-green-400 rounded-full animate-pulse"
-              ></span>
-              <span class="text-white text-sm font-mono">{{
-                cartStore.walletAddress
-              }}</span>
-              <span class="text-amber-400 text-xs ml-2"
-                >{{ cartStore.ethBalance }} ETH</span
+              Login
+            </router-link>
+            <router-link
+              to="/register"
+              class="px-4 py-2 bg-amber-600 text-white text-sm font-medium rounded-lg hover:bg-amber-700 transition-all shadow-md hover:shadow-lg"
+            >
+              Get Started
+            </router-link>
+          </template>
+
+          <template v-else>
+             <!-- Wallet Connect Button (Only if authenticated) -->
+            <button @click="toggleWallet" class="relative group">
+              <div
+                class="absolute inset-0 bg-gradient-to-r from-amber-400 to-amber-600 rounded-lg blur opacity-70 group-hover:opacity-100 transition duration-300"
+              ></div>
+              <div
+                class="relative px-4 py-2 bg-black rounded-lg flex items-center space-x-2"
               >
+                <span
+                  class="w-2 h-2 bg-green-400 rounded-full animate-pulse"
+                ></span>
+                <span class="text-white text-sm font-mono">{{
+                  cartStore.walletAddress
+                }}</span>
+              </div>
+            </button>
+
+            <!-- User Profile Dropdown / Logout -->
+            <div class="relative group ml-2">
+              <button class="flex items-center space-x-2 p-1 rounded-full hover:bg-gray-100 transition-colors">
+                <img :src="authStore.user.avatar" class="w-8 h-8 rounded-full border border-amber-200" alt="avatar" />
+                <i data-lucide="chevron-down" class="w-4 h-4 text-gray-500"></i>
+              </button>
+              <div class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                <div class="p-4 border-b border-gray-100">
+                  <p class="text-xs text-gray-500">Signed in as</p>
+                  <p class="text-sm font-bold text-gray-900 truncate">{{ authStore.user.name }}</p>
+                </div>
+                <div class="p-2">
+                  <button @click="handleLogout" class="w-full flex items-center space-x-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                    <i data-lucide="log-out" class="w-4 h-4"></i>
+                    <span>Log out</span>
+                  </button>
+                </div>
+              </div>
             </div>
-          </button>
+          </template>
 
           <!-- Cart with Dropdown -->
           <div class="relative">
@@ -291,28 +322,52 @@
               <i :data-lucide="item.icon" class="w-5 h-5"></i>
               <span>{{ item.name }}</span>
             </router-link>
+
+            <!-- Auth Mobile -->
+            <template v-if="!authStore.isAuthenticated">
+               <router-link
+                to="/login"
+                class="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-amber-50 hover:text-amber-600 rounded-xl transition-all duration-300"
+                @click="isMobileMenuOpen = false"
+              >
+                <i data-lucide="log-in" class="w-5 h-5"></i>
+                <span>Login</span>
+              </router-link>
+            </template>
+            <template v-else>
+               <button
+                @click="handleLogout(); isMobileMenuOpen = false"
+                class="w-full flex items-center space-x-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl transition-all duration-300"
+              >
+                <i data-lucide="log-out" class="w-5 h-5"></i>
+                <span>Logout</span>
+              </button>
+            </template>
           </div>
 
           <!-- Mobile Wallet & Cart -->
           <div class="mt-4 pt-4 border-t border-amber-100 space-y-3">
-            <div
-              class="flex items-center justify-between p-3 bg-black/5 rounded-xl"
-            >
-              <div class="flex items-center space-x-2">
-                <span
-                  class="w-2 h-2 bg-green-400 rounded-full animate-pulse"
-                ></span>
-                <span class="font-mono text-sm">{{
-                  cartStore.walletAddress
-                }}</span>
-              </div>
-              <span class="text-amber-600 font-mono text-sm"
-                >{{ cartStore.ethBalance }} ETH</span
+            <template v-if="authStore.isAuthenticated">
+              <div
+                class="flex items-center justify-between p-3 bg-black/5 rounded-xl"
               >
-            </div>
+                <div class="flex items-center space-x-2">
+                  <span
+                    class="w-2 h-2 bg-green-400 rounded-full animate-pulse"
+                  ></span>
+                  <span class="font-mono text-sm">{{
+                    cartStore.walletAddress
+                  }}</span>
+                </div>
+                <span class="text-amber-600 font-mono text-sm"
+                  >{{ cartStore.ethBalance }} ETH</span
+                >
+              </div>
+            </template>
 
             <div
               class="flex items-center justify-between p-3 bg-amber-50 rounded-xl"
+              @click="cartStore.toggleCart(); isMobileMenuOpen = false"
             >
               <div class="flex items-center space-x-2">
                 <i
@@ -335,7 +390,9 @@
 
 <script>
 import { useCartStore } from "@/stores/cart";
+import { useAuthStore } from "@/stores/auth";
 import { mapState } from "pinia";
+import { useRouter } from "vue-router";
 
 export default {
   name: "Navbar",
@@ -353,8 +410,21 @@ export default {
       ],
     };
   },
-  computed: {
-    ...mapState(useCartStore, ["totalItems"]),
+  setup() {
+    const cartStore = useCartStore();
+    const authStore = useAuthStore();
+    const router = useRouter();
+
+    const handleLogout = () => {
+      authStore.logout();
+      router.push("/");
+    };
+
+    return { 
+      cartStore, 
+      authStore,
+      handleLogout
+    };
   },
   mounted() {
     window.addEventListener("scroll", this.handleScroll);
@@ -374,9 +444,7 @@ export default {
       this.scrolled = window.scrollY > 50;
     },
     toggleWallet() {
-      // Simulate wallet connection toggle
-      const cartStore = useCartStore();
-      cartStore.walletConnected = !cartStore.walletConnected;
+      this.cartStore.walletConnected = !this.cartStore.walletConnected;
     },
     initIcons() {
       if (window.lucide) {
@@ -384,9 +452,6 @@ export default {
       }
     },
   },
-  setup() {
-    const cartStore = useCartStore();
-    return { cartStore };
-  },
 };
 </script>
+

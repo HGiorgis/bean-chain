@@ -66,13 +66,19 @@
             <div class="grid grid-cols-2 gap-4 mb-8">
               <div class="bg-white rounded-xl p-4 border border-amber-200">
                 <p class="text-sm text-gray-500 mb-1">Wallet Balance</p>
-                <p class="text-2xl font-mono font-bold">12.5 ETH</p>
-                <p class="text-xs text-gray-400">≈ $24,350</p>
+                <p class="text-2xl font-mono font-bold">
+                  {{ authStore.isAuthenticated ? authStore.user.balance : '0 ETH' }}
+                </p>
+                <p class="text-xs text-gray-400">≈ $0</p>
               </div>
               <div class="bg-white rounded-xl p-4 border border-amber-200">
                 <p class="text-sm text-gray-500 mb-1">Staked Beans</p>
-                <p class="text-2xl font-mono font-bold">8 NFTs</p>
-                <p class="text-xs text-amber-600">+2.3 ETH earned</p>
+                <p class="text-2xl font-mono font-bold">
+                  {{ authStore.isAuthenticated ? '8 NFTs' : '0 NFTs' }}
+                </p>
+                <p class="text-xs text-amber-600">
+                  {{ authStore.isAuthenticated ? '+2.3 ETH earned' : '0 ETH earned' }}
+                </p>
               </div>
             </div>
 
@@ -85,18 +91,25 @@
                 <select
                   class="flex-1 px-4 py-3 bg-white border border-amber-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500"
                 >
-                  <option>Ethiopia Yirgacheffe #2394</option>
-                  <option>Colombia Geisha #1842</option>
-                  <option>Guatemala Antigua #3721</option>
+                  <option v-if="!authStore.isAuthenticated">Login to see NFTs</option>
+                  <template v-else>
+                    <option>Ethiopia Yirgacheffe #2394</option>
+                    <option>Colombia Geisha #1842</option>
+                    <option>Guatemala Antigua #3721</option>
+                  </template>
                 </select>
                 <button
-                  class="px-6 py-3 bg-gradient-to-r from-amber-600 to-amber-700 text-white rounded-xl font-semibold hover:from-amber-700 hover:to-amber-800 transition-all flex items-center space-x-2"
+                  @click="handleStake"
+                  :disabled="isStaking"
+                  class="px-6 py-3 bg-gradient-to-r from-amber-600 to-amber-700 text-white rounded-xl font-semibold hover:from-amber-700 hover:to-amber-800 transition-all flex items-center space-x-2 disabled:opacity-50"
                 >
-                  <i data-lucide="lock" class="w-4 h-4"></i>
-                  <span>Stake</span>
+                  <i v-if="!isStaking" data-lucide="lock" class="w-4 h-4"></i>
+                  <i v-else class="w-4 h-4 animate-spin" data-lucide="loader-2"></i>
+                  <span>{{ isStaking ? 'Staking...' : 'Stake' }}</span>
                 </button>
               </div>
             </div>
+
 
             <!-- Staking Options -->
             <div class="grid grid-cols-3 gap-3 mb-8">
@@ -174,11 +187,15 @@
 
               <div class="space-y-4">
                 <button
-                  class="w-full py-3 bg-gradient-to-r from-amber-400 to-amber-500 text-amber-900 rounded-xl font-semibold hover:from-amber-500 hover:to-amber-600 transition-all flex items-center justify-center space-x-2"
+                  @click="handleClaim"
+                  :disabled="isClaiming"
+                  class="w-full py-3 bg-gradient-to-r from-amber-400 to-amber-500 text-amber-900 rounded-xl font-semibold hover:from-amber-500 hover:to-amber-600 transition-all flex items-center justify-center space-x-2 disabled:opacity-50"
                 >
-                  <i data-lucide="download" class="w-4 h-4"></i>
-                  <span>Claim Rewards</span>
+                  <i v-if="!isClaiming" data-lucide="download" class="w-4 h-4"></i>
+                  <i v-else class="w-4 h-4 animate-spin" data-lucide="loader-2"></i>
+                  <span>{{ isClaiming ? 'Claiming...' : 'Claim Rewards' }}</span>
                 </button>
+
 
                 <button
                   class="w-full py-3 bg-white/10 backdrop-blur-sm rounded-xl font-semibold hover:bg-white/20 transition-all flex items-center justify-center space-x-2"
@@ -256,10 +273,12 @@
               </div>
             </div>
             <button
+              @click="handleStake"
               class="w-full mt-4 py-2 border-2 border-amber-200 text-amber-700 rounded-xl hover:bg-amber-50 transition-colors"
             >
               Stake Now
             </button>
+
           </div>
         </div>
       </section>
@@ -267,80 +286,102 @@
   </div>
 </template>
 
-<script>
-import { ref } from "vue";
+<script setup>
+import { ref, onMounted } from "vue";
+import { useAuthStore } from "@/stores/auth";
 
-export default {
-  name: "StakingView",
-  setup() {
-    const selectedStakeOption = ref(30);
+const authStore = useAuthStore();
+const selectedStakeOption = ref(30);
+const isStaking = ref(false);
+const isClaiming = ref(false);
 
-    const stats = [
-      { icon: "coins", value: "$2.4M", label: "Total Value Locked", delay: 0 },
-      { icon: "users", value: "1,234", label: "Active Stakers", delay: 100 },
-      { icon: "bean", value: "8,942", label: "Beans Staked", delay: 200 },
-      { icon: "trending-up", value: "8.5%", label: "Avg. APY", delay: 300 },
-    ];
+const stats = [
+  { icon: "coins", value: "$2.4M", label: "Total Value Locked", delay: 0 },
+  { icon: "users", value: "1,234", label: "Active Stakers", delay: 100 },
+  { icon: "bean", value: "8,942", label: "Beans Staked", delay: 200 },
+  { icon: "trending-up", value: "8.5%", label: "Avg. APY", delay: 300 },
+];
 
-    const stakeOptions = [
-      { days: 30, apy: 6.5 },
-      { days: 60, apy: 7.8 },
-      { days: 90, apy: 9.2 },
-    ];
+const stakeOptions = [
+  { days: 30, apy: 6.5 },
+  { days: 60, apy: 7.8 },
+  { days: 90, apy: 9.2 },
+];
 
-    const stakedNFTs = [
-      {
-        id: 1,
-        name: "Ethiopia Yirgacheffe",
-        image:
-          "https://images.unsplash.com/photo-1442512595331-e89e73853f31?ixlib=rb-4.0.3&auto=format&fit=crop&w=64&q=80",
-        stakedDays: 45,
-        earned: 0.32,
-      },
-      {
-        id: 2,
-        name: "Colombia Geisha",
-        image:
-          "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?ixlib=rb-4.0.3&auto=format&fit=crop&w=64&q=80",
-        stakedDays: 23,
-        earned: 0.18,
-      },
-    ];
-
-    const stakingPools = [
-      {
-        name: "Single Bean Pool",
-        icon: "bean",
-        tvl: "$1.2M",
-        apy: 6.5,
-        lockPeriod: "Flexible",
-        minStake: 0.1,
-      },
-      {
-        name: "Farmers Pool",
-        icon: "tractor",
-        tvl: "$850K",
-        apy: 8.2,
-        lockPeriod: "60 days",
-        minStake: 0.5,
-      },
-      {
-        name: "Harvest Pool",
-        icon: "grain",
-        tvl: "$350K",
-        apy: 12.5,
-        lockPeriod: "90 days",
-        minStake: 1.0,
-      },
-    ];
-
-    return {
-      selectedStakeOption,
-      stats,
-      stakeOptions,
-      stakedNFTs,
-      stakingPools,
-    };
+const stakedNFTs = [
+  {
+    id: 1,
+    name: "Ethiopia Yirgacheffe",
+    image:
+      "https://images.unsplash.com/photo-1442512595331-e89e73853f31?ixlib=rb-4.0.3&auto=format&fit=crop&w=64&q=80",
+    stakedDays: 45,
+    earned: 0.32,
   },
+  {
+    id: 2,
+    name: "Colombia Geisha",
+    image:
+      "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?ixlib=rb-4.0.3&auto=format&fit=crop&w=64&q=80",
+    stakedDays: 23,
+    earned: 0.18,
+  },
+];
+
+const stakingPools = [
+  {
+    name: "Single Bean Pool",
+    icon: "bean",
+    tvl: "$1.2M",
+    apy: 6.5,
+    lockPeriod: "Flexible",
+    minStake: 0.1,
+  },
+  {
+    name: "Farmers Pool",
+    icon: "tractor",
+    tvl: "$850K",
+    apy: 8.2,
+    lockPeriod: "60 days",
+    minStake: 0.5,
+  },
+  {
+    name: "Harvest Pool",
+    icon: "grain",
+    tvl: "$350K",
+    apy: 12.5,
+    lockPeriod: "90 days",
+    minStake: 1.0,
+  },
+];
+
+const handleStake = async () => {
+  if (!authStore.isAuthenticated) {
+    alert("Please login to stake your beans.");
+    return;
+  }
+  isStaking.value = true;
+  await new Promise(resolve => setTimeout(resolve, 1500));
+  isStaking.value = false;
+  alert("NFT staked successfully!");
 };
+
+const handleClaim = async () => {
+  if (!authStore.isAuthenticated) {
+    alert("Please login to claim rewards.");
+    return;
+  }
+  isClaiming.value = true;
+  await new Promise(resolve => setTimeout(resolve, 1500));
+  isClaiming.value = false;
+  alert("0.85 ETH claimed to your wallet!");
+};
+
+const initIcons = () => {
+  if (window.lucide) {
+    window.lucide.createIcons();
+  }
+};
+
+onMounted(initIcons);
 </script>
+

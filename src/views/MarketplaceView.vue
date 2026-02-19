@@ -378,11 +378,13 @@
 <script>
 import { ref, computed, onMounted } from "vue";
 import { useCartStore } from "@/stores/cart";
+import { useProjectsStore } from "@/stores/projects";
 
 export default {
   name: "MarketplaceView",
   setup() {
     const cartStore = useCartStore();
+    const projectsStore = useProjectsStore();
     const isLoading = ref(false);
     const visibleCount = ref(6);
 
@@ -410,163 +412,9 @@ export default {
       sort: "newest",
     });
 
-    // Sample Bean Data
-    const beans = ref([
-      {
-        id: 1,
-        title: "Ethiopia Yirgacheffe",
-        origin: "Sidama, Ethiopia",
-        image:
-          "https://images.unsplash.com/photo-1442512595331-e89e73853f31?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-        tags: ["Grade 1", "Washed", "Organic", "Floral"],
-        price: "2.5",
-        currentBid: "2.5",
-        volume: "124.5",
-        rating: 5,
-        reviews: 234,
-        auction: false,
-        featured: true,
-        isNew: false,
-        progress: 100,
-        farmer: {
-          name: "Tesfaye Gemechu",
-          avatar:
-            "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-4.0.3&auto=format&fit=crop&w=64&q=80",
-          beans: 156,
-        },
-        isFavorite: false,
-      },
-      {
-        id: 2,
-        title: "Colombia Geisha",
-        origin: "Huila, Colombia",
-        image:
-          "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-        tags: ["Geisha", "Natural", "Limited", "Competition"],
-        price: "3.8",
-        currentBid: "4.2",
-        volume: "89.2",
-        rating: 5,
-        reviews: 189,
-        auction: true,
-        featured: true,
-        isNew: true,
-        timeLeft: "2h 34m",
-        timeProgress: 65,
-        progress: 92,
-        farmer: {
-          name: "Maria Valencia",
-          avatar:
-            "https://images.unsplash.com/photo-1494790108777-466d68a5c5a3?ixlib=rb-4.0.3&auto=format&fit=crop&w=64&q=80",
-          beans: 89,
-        },
-        isFavorite: false,
-      },
-      {
-        id: 3,
-        title: "Guatemala Antigua",
-        origin: "Antigua, Guatemala",
-        image:
-          "https://images.unsplash.com/photo-1461023058943-07fcbe16d735?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-        tags: ["Volcanic", "SHB", "Estate", "Chocolate"],
-        price: "1.9",
-        currentBid: "1.9",
-        volume: "67.3",
-        rating: 4,
-        reviews: 156,
-        auction: false,
-        featured: false,
-        isNew: false,
-        progress: 100,
-        farmer: {
-          name: "Diego Gonzalez",
-          avatar:
-            "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=64&q=80",
-          beans: 203,
-        },
-        isFavorite: true,
-      },
-      {
-        id: 4,
-        title: "Kenya AA",
-        origin: "Nyeri, Kenya",
-        image:
-          "https://images.unsplash.com/photo-1559525833-b9e8c9c7cf4f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-        tags: ["AA", "SL28", "Blackcurrant", "Washed"],
-        price: "3.2",
-        currentBid: "3.5",
-        volume: "234.1",
-        rating: 5,
-        reviews: 312,
-        auction: true,
-        featured: true,
-        isNew: false,
-        timeLeft: "5h 12m",
-        timeProgress: 45,
-        progress: 78,
-        farmer: {
-          name: "Njeri Wanjiku",
-          avatar:
-            "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?ixlib=rb-4.0.3&auto=format&fit=crop&w=64&q=80",
-          beans: 167,
-        },
-        isFavorite: false,
-      },
-      {
-        id: 5,
-        title: "Costa Rica Tarrazú",
-        origin: "Tarrazú, Costa Rica",
-        image:
-          "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?lib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-        tags: ["Honey", "SHB", "Micro-lot", "Citrus"],
-        price: "2.8",
-        currentBid: "2.8",
-        volume: "145.8",
-        rating: 4,
-        reviews: 178,
-        auction: false,
-        featured: false,
-        isNew: true,
-        progress: 100,
-        farmer: {
-          name: "Carlos Rodriguez",
-          avatar:
-            "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=64&q=80",
-          beans: 92,
-        },
-        isFavorite: false,
-      },
-      {
-        id: 6,
-        title: "Panama Geisha",
-        origin: "Boquete, Panama",
-        image:
-          "https://images.unsplash.com/photo-1611854779393-1b2da9d400fe?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-        tags: ["Geisha", "Natural", "Competition", "Limited"],
-        price: "5.5",
-        currentBid: "6.8",
-        volume: "456.2",
-        rating: 5,
-        reviews: 423,
-        auction: true,
-        featured: true,
-        isNew: true,
-        timeLeft: "1d 3h",
-        timeProgress: 82,
-        progress: 95,
-        farmer: {
-          name: "Elena Santos",
-          avatar:
-            "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?ixlib=rb-4.0.3&auto=format&fit=crop&w=64&q=80",
-          beans: 45,
-        },
-        isFavorite: false,
-      },
-    ]);
-
     // Filtered and Sorted Beans
     const filteredBeans = computed(() => {
-      let filtered = beans.value;
+      let filtered = projectsStore.projects;
 
       // Apply search filter
       if (filters.value.search) {
@@ -669,17 +517,18 @@ export default {
       bean.isFavorite = !bean.isFavorite;
     };
 
-    onMounted(() => {
+    onMounted(async () => {
+      await projectsStore.fetchProjects();
       if (window.lucide) {
         window.lucide.createIcons();
       }
     });
 
     return {
+      projectsStore,
       marketStats,
       filterOptions,
       filters,
-      beans,
       filteredBeans,
       hasActiveFilters,
       getCategoryLabel,
@@ -692,6 +541,7 @@ export default {
   },
 };
 </script>
+
 
 <style scoped>
 /* Additional animations for marketplace */

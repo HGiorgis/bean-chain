@@ -500,86 +500,71 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { computed, onMounted, onUpdated } from 'vue';
 import { useProjectsStore } from "@/stores/projects";
+import { useCartStore } from "@/stores/cart";
+import { useRouter } from 'vue-router';
 
-export default {
-  name: "HomeView",
-  setup() {
-    const projectsStore = useProjectsStore();
+const projectsStore = useProjectsStore();
+const cartStore = useCartStore();
+const router = useRouter();
 
-    // Enhanced coffee-themed projects
-    const featuredProjects = [
-      {
-        id: 1,
-        title: "Ethiopia Yirgacheffe",
-        origin: "Sidama, Ethiopia",
-        image:
-          "https://images.unsplash.com/photo-1442512595331-e89e73853f31?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-        technologies: ["Grade 1", "Washed", "Organic"],
-        bid: "2.5",
-        progress: 78,
-        liveUrl: "#",
-        githubUrl: "#",
-      },
-      {
-        id: 2,
-        title: "Colombia Geisha",
-        origin: "Huila, Colombia",
-        image:
-          "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-        technologies: ["Geisha", "Natural", "Limited"],
-        bid: "3.8",
-        progress: 92,
-        liveUrl: "#",
-        githubUrl: "#",
-      },
-      {
-        id: 3,
-        title: "Guatemala Antigua",
-        origin: "Antigua, Guatemala",
-        image:
-          "https://images.unsplash.com/photo-1461023058943-07fcbe16d735?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-        technologies: ["Volcanic", "SHB", "Estate"],
-        bid: "1.9",
-        progress: 45,
-        liveUrl: "#",
-        githubUrl: "#",
-      },
-    ];
+// Use projects from store for featured section
+const featuredProjects = computed(() => {
+  return projectsStore.projects.slice(0, 3).length > 0 
+    ? projectsStore.projects.slice(0, 3) 
+    : [
+        {
+          id: 1,
+          title: "Ethiopia Yirgacheffe",
+          origin: "Sidama, Ethiopia",
+          image: "https://images.unsplash.com/photo-1442512595331-e89e73853f31?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+          technologies: ["Grade 1", "Washed", "Organic"],
+          bid: "2.5",
+          progress: 78,
+        },
+        // Fallback or while loading
+      ];
+});
 
-    // Enhanced skills with blockchain focus and Lucide icons
-    const skills = [
-      { name: "Ethereum", level: "Mainnet", icon: "hexagon", rating: 5 },
-      { name: "Polygon", level: "Sidechain", icon: "layers", rating: 5 },
-      { name: "IPFS", level: "Storage", icon: "database", rating: 4 },
-      { name: "Chainlink", level: "Oracles", icon: "link-2", rating: 4 },
-      { name: "The Graph", level: "Indexing", icon: "bar-chart-2", rating: 4 },
-      { name: "OpenZeppelin", level: "Contracts", icon: "shield", rating: 5 },
-      { name: "WalletConnect", level: "Web3", icon: "plug", rating: 4 },
-      { name: "Solidity", level: "Language", icon: "code-2", rating: 5 },
-    ];
+const skills = [
+  { name: "Ethereum", level: "Mainnet", icon: "hexagon", rating: 5 },
+  { name: "Polygon", level: "Sidechain", icon: "layers", rating: 5 },
+  { name: "IPFS", level: "Storage", icon: "database", rating: 4 },
+  { name: "Chainlink", level: "Oracles", icon: "link-2", rating: 4 },
+  { name: "The Graph", level: "Indexing", icon: "bar-chart-2", rating: 4 },
+  { name: "OpenZeppelin", level: "Contracts", icon: "shield", rating: 5 },
+  { name: "WalletConnect", level: "Web3", icon: "plug", rating: 4 },
+  { name: "Solidity", level: "Language", icon: "code-2", rating: 5 },
+];
 
-    return {
-      featuredProjects,
-      skills,
-    };
-  },
-  mounted() {
-    this.initIcons();
-  },
-  updated() {
-    this.initIcons();
-  },
-  methods: {
-    initIcons() {
-      if (window.lucide) {
-        window.lucide.createIcons();
-      }
-    },
-  },
+const navigateToMarketplace = () => {
+  router.push('/marketplace');
 };
+
+const addToCart = (project) => {
+  cartStore.addToCart({
+    ...project,
+    bid: parseFloat(project.bid) || 2.5,
+    quantity: 1
+  });
+};
+
+const initIcons = () => {
+  if (window.lucide) {
+    window.lucide.createIcons();
+  }
+};
+
+onMounted(async () => {
+  await projectsStore.fetchProjects();
+  initIcons();
+});
+
+onUpdated(initIcons);
 </script>
+
 
 <style scoped>
 @keyframes float {

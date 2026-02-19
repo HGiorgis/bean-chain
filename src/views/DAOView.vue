@@ -57,8 +57,13 @@
             </div>
             <div>
               <p class="text-sm text-gray-600 mb-1">Your Voting Power</p>
-              <p class="text-3xl font-mono font-bold">2,342 BEAN</p>
-              <p class="text-sm text-amber-600">≈ 2.3% of total supply</p>
+              <p class="text-3xl font-mono font-bold">
+                {{ authStore.isAuthenticated ? '2,342 BEAN' : '0 BEAN' }}
+              </p>
+              <p class="text-sm text-amber-600">
+                {{ authStore.isAuthenticated ? '≈ 2.3% of total supply' : 'Login to see power' }}
+              </p>
+
             </div>
           </div>
           <div class="flex space-x-4">
@@ -126,19 +131,24 @@
               ></div>
             </div>
 
-            <!-- Vote Buttons -->
             <div class="flex space-x-4 pt-4">
               <button
-                class="flex-1 px-4 py-2 bg-green-500 text-white rounded-xl hover:bg-green-600 transition-colors flex items-center justify-center space-x-2"
+                @click="handleVote(proposal.id, 'for')"
+                :disabled="isVoting === proposal.id"
+                class="flex-1 px-4 py-2 bg-green-500 text-white rounded-xl hover:bg-green-600 transition-colors flex items-center justify-center space-x-2 disabled:opacity-50"
               >
-                <i data-lucide="thumbs-up" class="w-4 h-4"></i>
-                <span>Vote For</span>
+                <i v-if="isVoting !== proposal.id" data-lucide="thumbs-up" class="w-4 h-4"></i>
+                <i v-else class="w-4 h-4 animate-spin" data-lucide="loader-2"></i>
+                <span>{{ isVoting === proposal.id ? 'Voting...' : 'Vote For' }}</span>
               </button>
               <button
-                class="flex-1 px-4 py-2 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-colors flex items-center justify-center space-x-2"
+                @click="handleVote(proposal.id, 'against')"
+                :disabled="isVoting === proposal.id"
+                class="flex-1 px-4 py-2 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-colors flex items-center justify-center space-x-2 disabled:opacity-50"
               >
-                <i data-lucide="thumbs-down" class="w-4 h-4"></i>
-                <span>Vote Against</span>
+                <i v-if="isVoting !== proposal.id" data-lucide="thumbs-down" class="w-4 h-4"></i>
+                <i v-else class="w-4 h-4 animate-spin" data-lucide="loader-2"></i>
+                <span>{{ isVoting === proposal.id ? 'Voting...' : 'Vote Against' }}</span>
               </button>
             </div>
           </div>
@@ -184,53 +194,71 @@
   </div>
 </template>
 
-<script>
-import { ref } from "vue";
+<script setup>
+import { ref, onMounted } from "vue";
+import { useAuthStore } from "@/stores/auth";
 
-export default {
-  name: "DAOView",
-  setup() {
-    const daoStats = [
-      { icon: "users", value: "3,421", label: "DAO Members", delay: 0 },
-      { icon: "vote", value: "234", label: "Total Proposals", delay: 100 },
-      { icon: "bean", value: "102K", label: "BEAN Supply", delay: 200 },
-      { icon: "calendar", value: "12", label: "Active Proposals", delay: 300 },
-    ];
+const authStore = useAuthStore();
+const isVoting = ref(null); // id of proposal being voted on
 
-    const activeProposals = [
-      {
-        id: 42,
-        title: "Increase Farmer Royalties to 5%",
-        description:
-          "Proposal to increase the royalty fee for farmers from 3% to 5% on secondary sales.",
-        timeLeft: "2 days",
-        for: 78,
-        against: 22,
-      },
-      {
-        id: 41,
-        title: "Add Single Origin Ethiopia Collection",
-        description:
-          "Add 5 new Ethiopian coffee lots to the marketplace from the Yirgacheffe region.",
-        timeLeft: "3 days",
-        for: 92,
-        against: 8,
-      },
-      {
-        id: 40,
-        title: "Treasury Allocation for Coffee Education",
-        description:
-          "Allocate 50 ETH from treasury to fund coffee education programs in origin countries.",
-        timeLeft: "5 days",
-        for: 64,
-        against: 36,
-      },
-    ];
+const daoStats = [
+  { icon: "users", value: "3,421", label: "DAO Members", delay: 0 },
+  { icon: "vote", value: "234", label: "Total Proposals", delay: 100 },
+  { icon: "bean", value: "102K", label: "BEAN Supply", delay: 200 },
+  { icon: "calendar", value: "12", label: "Active Proposals", delay: 300 },
+];
 
-    return {
-      daoStats,
-      activeProposals,
-    };
+const activeProposals = ref([
+  {
+    id: 42,
+    title: "Increase Farmer Royalties to 5%",
+    description: "Proposal to increase the royalty fee for farmers from 3% to 5% on secondary sales.",
+    timeLeft: "2 days",
+    for: 78,
+    against: 22,
   },
+  {
+    id: 41,
+    title: "Add Single Origin Ethiopia Collection",
+    description: "Add 5 new Ethiopian coffee lots to the marketplace from the Yirgacheffe region.",
+    timeLeft: "3 days",
+    for: 92,
+    against: 8,
+  },
+  {
+    id: 40,
+    title: "Treasury Allocation for Coffee Education",
+    description: "Allocate 50 ETH from treasury to fund coffee education programs in origin countries.",
+    timeLeft: "5 days",
+    for: 64,
+    against: 36,
+  },
+]);
+
+const handleVote = async (proposalId, type) => {
+  if (!authStore.isAuthenticated) {
+    alert("Please login to vote in the DAO.");
+    return;
+  }
+  isVoting.value = proposalId;
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  
+  const proposal = activeProposals.value.find(p => p.id === proposalId);
+  if (proposal) {
+    if (type === 'for') proposal.for += 1;
+    else proposal.against += 1;
+  }
+  
+  isVoting.value = null;
+  alert(`Vote cast: ${type === 'for' ? 'For' : 'Against'} PIP-${proposalId}`);
 };
+
+const initIcons = () => {
+  if (window.lucide) {
+    window.lucide.createIcons();
+  }
+};
+
+onMounted(initIcons);
 </script>
+

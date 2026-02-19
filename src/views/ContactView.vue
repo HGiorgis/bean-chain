@@ -373,112 +373,114 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: "ContactView",
-  data() {
-    return {
-      form: {
-        name: "",
-        email: "",
-        subject: "",
-        message: "",
-        wallet: "",
-      },
-      formSubmitted: false,
-      openFaqs: [],
-      contactCards: [
-        {
-          title: "Partnership Inquiries",
-          description:
-            "Looking to collaborate? Let's brew something amazing together.",
-          icon: "handshake",
-          action: "partner@beanchain.crypto",
-          link: "mailto:partner@beanchain.crypto",
-        },
-        {
-          title: "Technical Support",
-          description:
-            "Having trouble with your beans? Our tech team is here to help.",
-          icon: "cpu",
-          action: "support@beanchain.crypto",
-          link: "mailto:support@beanchain.crypto",
-        },
-        {
-          title: "Farmer Relations",
-          description:
-            "Are you a coffee farmer? Join our decentralized network.",
-          icon: "sprout",
-          action: "farmers@beanchain.crypto",
-          link: "mailto:farmers@beanchain.crypto",
-        },
-      ],
-      socialLinks: [
-        { name: "Twitter", icon: "twitter", link: "#" },
-        { name: "Discord", icon: "message-circle", link: "#" },
-        { name: "GitHub", icon: "github", link: "#" },
-        { name: "LinkedIn", icon: "linkedin", link: "#" },
-      ],
-      faqs: [
-        {
-          question: "How do I purchase a Bean NFT?",
-          answer:
-            "You'll need an Ethereum wallet like MetaMask with some ETH for gas fees. Connect your wallet, browse our marketplace, and click 'Buy Now' on any Bean NFT you like.",
-        },
-        {
-          question: "What makes BeanChain different?",
-          answer:
-            "We're the first platform that tokenizes actual coffee batches, providing full traceability from farm to cup. Each NFT represents real, verified coffee beans.",
-        },
-        {
-          question: "How do I stake my Bean NFTs?",
-          answer:
-            "Navigate to the Staking page, connect your wallet, select the Bean NFTs you want to stake, and confirm the transaction. You'll start earning rewards immediately.",
-        },
-        {
-          question: "Can I visit the farms?",
-          answer:
-            "Yes! Bean NFT holders get exclusive access to virtual and physical farm tours. Some tiers even include all-expenses-paid trips to origin countries.",
-        },
-      ],
-    };
-  },
-  mounted() {
-    this.initIcons();
-  },
-  updated() {
-    this.initIcons();
-  },
-  methods: {
-    handleSubmit() {
-      // Simulate form submission
-      this.formSubmitted = true;
-      setTimeout(() => {
-        this.formSubmitted = false;
-      }, 5000);
+<script setup>
+import { ref, reactive, onMounted, onUpdated } from 'vue';
+import { mockApi } from '@/services/mockApi';
 
-      // Reset form
-      this.form = {
-        name: "",
-        email: "",
-        subject: "",
-        message: "",
-        wallet: "",
-      };
-    },
-    toggleFaq(index) {
-      if (this.openFaqs.includes(index)) {
-        this.openFaqs = this.openFaqs.filter((i) => i !== index);
-      } else {
-        this.openFaqs.push(index);
-      }
-      this.initIcons();
-    },
-    initIcons() {
-      if (window.lucide) {
-        window.lucide.createIcons();
-      }
-    },
+const form = reactive({
+  name: "",
+  email: "",
+  subject: "",
+  message: "",
+  wallet: "",
+});
+
+const isSubmitting = ref(false);
+const formSubmitted = ref(false);
+const openFaqs = ref([]);
+
+const contactCards = [
+  {
+    title: "Partnership Inquiries",
+    description: "Looking to collaborate? Let's brew something amazing together.",
+    icon: "handshake",
+    action: "partner@beanchain.crypto",
+    link: "mailto:partner@beanchain.crypto",
   },
+  {
+    title: "Technical Support",
+    description: "Having trouble with your beans? Our tech team is here to help.",
+    icon: "cpu",
+    action: "support@beanchain.crypto",
+    link: "mailto:support@beanchain.crypto",
+  },
+  {
+    title: "Farmer Relations",
+    description: "Are you a coffee farmer? Join our decentralized network.",
+    icon: "sprout",
+    action: "farmers@beanchain.crypto",
+    link: "mailto:farmers@beanchain.crypto",
+  },
+];
+
+const socialLinks = [
+  { name: "Twitter", icon: "twitter", link: "#" },
+  { name: "Discord", icon: "message-circle", link: "#" },
+  { name: "GitHub", icon: "github", link: "#" },
+  { name: "LinkedIn", icon: "linkedin", link: "#" },
+];
+
+const faqs = [
+  {
+    question: "How do I purchase a Bean NFT?",
+    answer: "You'll need an Ethereum wallet like MetaMask with some ETH for gas fees. Connect your wallet, browse our marketplace, and click 'Buy Now' on any Bean NFT you like.",
+  },
+  {
+    question: "What makes BeanChain different?",
+    answer: "We're the first platform that tokenizes actual coffee batches, providing full traceability from farm to cup. Each NFT represents real, verified coffee beans.",
+  },
+  {
+    question: "How do I stake my Bean NFTs?",
+    answer: "Navigate to the Staking page, connect your wallet, select the Bean NFTs you want to stake, and confirm the transaction. You'll start earning rewards immediately.",
+  },
+  {
+    question: "How do I stake my Bean NFTs?",
+    answer: "Navigate to the Staking page, connect your wallet, select the Bean NFTs you want to stake, and confirm the transaction. You'll start earning rewards immediately.",
+  },
+  {
+    question: "Can I visit the farms?",
+    answer: "Yes! Bean NFT holders get exclusive access to virtual and physical farm tours. Some tiers even include all-expenses-paid trips to origin countries.",
+  },
+];
+
+const handleSubmit = async () => {
+  isSubmitting.value = true;
+  try {
+    await mockApi.sendMessage({ ...form });
+    formSubmitted.value = true;
+    
+    // Reset form
+    form.name = "";
+    form.email = "";
+    form.subject = "";
+    form.message = "";
+    form.wallet = "";
+    
+    setTimeout(() => {
+      formSubmitted.value = false;
+    }, 5000);
+  } catch (err) {
+    console.error("Failed to send message:", err);
+  } finally {
+    isSubmitting.value = false;
+  }
 };
+
+const toggleFaq = (index) => {
+  if (openFaqs.value.includes(index)) {
+    openFaqs.value = openFaqs.value.filter((i) => i !== index);
+  } else {
+    openFaqs.value.push(index);
+  }
+  setTimeout(initIcons, 0);
+};
+
+const initIcons = () => {
+  if (window.lucide) {
+    window.lucide.createIcons();
+  }
+};
+
+onMounted(initIcons);
+onUpdated(initIcons);
 </script>
