@@ -18,7 +18,7 @@
             animationDuration: 15 + Math.random() * 10 + 's',
           }"
         >
-          🫘
+          <i data-lucide="bean" class="w-8 h-8 text-amber-900"></i>
         </div>
       </div>
     </div>
@@ -61,15 +61,10 @@
               <br />
               <span class="relative">
                 Future of Coffee
-                <svg
+                <i
+                  data-lucide="check-circle"
                   class="absolute -right-12 top-0 w-16 h-16 text-amber-400 animate-bounce-slow"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                >
-                  <path
-                    d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
-                  />
-                </svg>
+                ></i>
               </span>
             </h1>
 
@@ -86,19 +81,10 @@
               >
                 <span class="relative z-10 flex items-center space-x-2">
                   <span>Explore Marketplace</span>
-                  <svg
+                  <i
+                    data-lucide="arrow-right"
                     class="w-5 h-5 group-hover:translate-x-1 transition-transform"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M17 8l4 4m0 0l-4 4m4-4H3"
-                    />
-                  </svg>
+                  ></i>
                 </span>
                 <div
                   class="absolute inset-0 bg-gradient-to-r from-amber-700 to-amber-800 opacity-0 group-hover:opacity-100 transition-opacity"
@@ -110,8 +96,9 @@
               >
                 <span
                   class="w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center"
-                  >🎥</span
                 >
+                  <i data-lucide="play" class="w-4 h-4"></i>
+                </span>
                 <span>Watch Demo</span>
               </button>
             </div>
@@ -210,9 +197,10 @@
 
               <!-- Floating Badges -->
               <div
-                class="absolute -top-4 -right-4 bg-gradient-to-r from-amber-400 to-amber-500 text-white px-4 py-2 rounded-full text-sm font-bold shadow-xl animate-bounce-slow"
+                class="absolute -top-4 -right-4 bg-gradient-to-r from-amber-400 to-amber-500 text-white px-4 py-2 rounded-full text-sm font-bold shadow-xl animate-bounce-slow flex items-center space-x-1"
               >
-                🔥 HOT SALE
+                <i data-lucide="flame" class="w-4 h-4"></i>
+                <span>HOT SALE</span>
               </div>
               <div
                 class="absolute -bottom-4 -left-4 bg-white px-4 py-2 rounded-full text-sm font-bold shadow-xl flex items-center space-x-1"
@@ -366,19 +354,7 @@
                   <button
                     class="px-4 py-2 border-2 border-amber-200 text-amber-700 rounded-xl hover:bg-amber-50 transition-colors"
                   >
-                    <svg
-                      class="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                      />
-                    </svg>
+                    <i data-lucide="heart" class="w-5 h-5"></i>
                   </button>
                 </div>
               </div>
@@ -391,19 +367,10 @@
             class="group inline-flex items-center space-x-2 bg-black text-white px-8 py-4 rounded-2xl font-bold hover:bg-amber-700 transition-colors duration-300 hover:shadow-2xl"
           >
             <span>View All Beans</span>
-            <svg
+            <i
+              data-lucide="arrow-right"
               class="w-5 h-5 group-hover:translate-x-1 transition-transform"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M17 8l4 4m0 0l-4 4m4-4H3"
-              />
-            </svg>
+            ></i>
           </button>
         </div>
       </div>
@@ -441,9 +408,10 @@
               <div
                 class="relative bg-white/5 backdrop-blur-lg rounded-2xl p-6 border border-white/10 hover:border-amber-400/50 transition-all duration-300 hover:-translate-y-2"
               >
-                <div class="text-5xl mb-4 filter drop-shadow-lg">
-                  {{ skill.icon }}
-                </div>
+                <i
+                  :data-lucide="skill.icon"
+                  class="w-12 h-12 mx-auto mb-4 text-amber-400"
+                ></i>
                 <h4 class="text-white font-bold mb-2">{{ skill.name }}</h4>
                 <div class="flex items-center justify-center space-x-1">
                   <span class="text-amber-300 text-sm">{{ skill.level }}</span>
@@ -497,19 +465,10 @@
                 class="group bg-white text-amber-700 px-10 py-5 rounded-2xl font-bold text-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center space-x-2"
               >
                 <span>Mint Your Bean NFT</span>
-                <svg
+                <i
+                  data-lucide="plus-circle"
                   class="w-6 h-6 group-hover:rotate-90 transition-transform"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                  />
-                </svg>
+                ></i>
               </button>
 
               <button
@@ -589,22 +548,35 @@ export default {
       },
     ];
 
-    // Enhanced skills with blockchain focus
+    // Enhanced skills with blockchain focus and Lucide icons
     const skills = [
-      { name: "Ethereum", level: "Mainnet", icon: "⬡", rating: 5 },
-      { name: "Polygon", level: "Sidechain", icon: "🔷", rating: 5 },
-      { name: "IPFS", level: "Storage", icon: "📡", rating: 4 },
-      { name: "Chainlink", level: "Oracles", icon: "🔗", rating: 4 },
-      { name: "The Graph", level: "Indexing", icon: "📊", rating: 4 },
-      { name: "OpenZeppelin", level: "Contracts", icon: "⚙️", rating: 5 },
-      { name: "WalletConnect", level: "Web3", icon: "🔌", rating: 4 },
-      { name: "Solidity", level: "Language", icon: "⚡", rating: 5 },
+      { name: "Ethereum", level: "Mainnet", icon: "hexagon", rating: 5 },
+      { name: "Polygon", level: "Sidechain", icon: "layers", rating: 5 },
+      { name: "IPFS", level: "Storage", icon: "database", rating: 4 },
+      { name: "Chainlink", level: "Oracles", icon: "link-2", rating: 4 },
+      { name: "The Graph", level: "Indexing", icon: "bar-chart-2", rating: 4 },
+      { name: "OpenZeppelin", level: "Contracts", icon: "shield", rating: 5 },
+      { name: "WalletConnect", level: "Web3", icon: "plug", rating: 4 },
+      { name: "Solidity", level: "Language", icon: "code-2", rating: 5 },
     ];
 
     return {
       featuredProjects,
       skills,
     };
+  },
+  mounted() {
+    this.initIcons();
+  },
+  updated() {
+    this.initIcons();
+  },
+  methods: {
+    initIcons() {
+      if (window.lucide) {
+        window.lucide.createIcons();
+      }
+    },
   },
 };
 </script>
